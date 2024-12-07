@@ -20,9 +20,10 @@ class NamazTimeController extends Controller
             $namazTime = new NamazTime();
             $namazTime->name = $request->name;
             $namazTime->time = $request->time;
+            $namazTime->azanTime = $request->azanTime ?? null;
             $namazTime->save();
 
-            $converted = arrayKeysToCamelCase($namazTime);
+            $converted = arrayKeysToCamelCase($namazTime->toArray());
             return response()->json($converted, 200);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
@@ -106,6 +107,7 @@ class NamazTimeController extends Controller
 
             $namazTime->name = $request->name ?? $namazTime->name;
             $namazTime->time = $request->time ?? $namazTime->time;
+            $namazTime->azanTime = $request->azanTime ?? $namazTime->azanTime;
             $namazTime->save();
 
             $converted = arrayKeysToCamelCase($namazTime->toArray());

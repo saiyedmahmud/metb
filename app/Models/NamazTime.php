@@ -12,7 +12,7 @@ class NamazTime extends Model
     protected $table = 'namazTime';
 
     protected $fillable = [
-        'fajr',
-        'time'
+        'time',
+        'azanTime',
     ];
 }

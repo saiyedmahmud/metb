@@ -119,12 +119,15 @@ class UserService
                     'lastName' => $userData['lastName'] ?? null,
                     'username' => $userData['username'],
                     'password' => $hash,
-                    'roleId' => $userData['roleId'],
+                    'roleId' => $userData['roleId'] ?? 1,
                     'email' => $userData['email'] ?? null,
                     'phone' => $userData['phone'] ?? null,
                     'image' => $userData['image'] ?? null,
-                    'shiftId' => $userData['shiftId'] ?? null,
                 ]);
+
+                if (!$createUser) {
+                    return $this->badRequest('User not created');
+                }
 
                 $this->updateRolePermission($userData);
 

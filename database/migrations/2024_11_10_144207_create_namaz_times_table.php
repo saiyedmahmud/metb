@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('time')->nullable();
+            $table->string('azanTime')->nullable();
             $table->string('status')->default('true');
             $table->timestamps();
         });
