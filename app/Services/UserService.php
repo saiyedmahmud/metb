@@ -119,7 +119,7 @@ class UserService
                     'lastName' => $userData['lastName'] ?? null,
                     'username' => $userData['username'],
                     'password' => $hash,
-                    'roleId' => $userData['roleId'] ?? 1,
+                    'roleId' =>1,
                     'email' => $userData['email'] ?? null,
                     'phone' => $userData['phone'] ?? null,
                     'image' => $userData['image'] ?? null,
