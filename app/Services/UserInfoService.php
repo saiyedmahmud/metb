@@ -35,7 +35,6 @@ class UserInfoService
         try {
             $allUser = Users::orderBy('id', 'desc')
                 ->where('status', 'true')
-                ->with('saleInvoice')
                 ->get();
 
             $filteredUsers = $allUser->map(function ($user) {
