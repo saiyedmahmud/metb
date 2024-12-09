@@ -125,8 +125,7 @@ class NamazTimeController extends Controller
                 return response()->json(['message' => 'Namaz Time not found'], 404);
             }
 
-            $namazTime->status = $request->status;
-            $namazTime->save();
+            $namazTime->delete();
             return response()->json(['message' => 'Namaz Time deleted successfully'], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);

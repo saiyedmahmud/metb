@@ -14,7 +14,7 @@ class DashboardController extends Controller
     public function getDashboardData(Request $request): JsonResponse
     {
         try {
-           
+
             $totalDonation = Invoice::whereHas('category', function ($query) {
                 $query->where('type', 'donation');
             })->sum('amount');
@@ -24,12 +24,12 @@ class DashboardController extends Controller
                 $query->where('type', 'expense');
             })->sum('amount');
 
-            
+
             $lastWeekJummahCollection = Invoice::whereHas('category', function ($query) {
                 $query->where('name', 'JUMMAH COLLECTION');
             })->where('date', '>=', Carbon::now()->subDays(7))->sum('amount');
 
-            
+
             $lastWeekMagribCollection = Invoice::whereHas('category', function ($query) {
                 $query->where('name', 'MAGRIB COLLECTION');
             })->where('date', '>=', Carbon::now()->subDays(7))->sum('amount');
@@ -55,7 +55,7 @@ class DashboardController extends Controller
                         SUM(CASE WHEN category.type = 'donation' THEN amount ELSE 0 END) as income,
                         SUM(CASE WHEN category.type = 'expense' THEN amount ELSE 0 END) as expense")
                     ->join('invoiceCategory as category', 'invoice.invoiceCategoryId', '=', 'category.id')
-                    ->whereYear('date', Carbon::now()->year) 
+                    ->whereYear('date', Carbon::now()->year)
                     ->groupByRaw('MONTHNAME(date), MONTH(date)')
                     ->orderBy('month_number')
                     ->get()
@@ -72,18 +72,18 @@ class DashboardController extends Controller
                 $days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
                 $weeklyData = Invoice::selectRaw("DAYNAME(date) as name,
-            DAYOFWEEK(date) as day_number,
-            SUM(CASE WHEN category.type = 'donation' THEN amount ELSE 0 END) as income,
-            SUM(CASE WHEN category.type = 'expense' THEN amount ELSE 0 END) as expense")
+                ((DAYOFWEEK(date) + 5) % 7) + 1 as day_number,
+                SUM(CASE WHEN category.type = 'donation' THEN amount ELSE 0 END) as income,
+                SUM(CASE WHEN category.type = 'expense' THEN amount ELSE 0 END) as expense")
                     ->join('invoiceCategory as category', 'invoice.invoiceCategoryId', '=', 'category.id')
-                    ->whereYear('date', Carbon::now()->year) 
-                    ->whereRaw('WEEK(date, 1) = WEEK(CURDATE(), 1)') 
-                    ->groupByRaw('DAYNAME(date), DAYOFWEEK(date)')
+                    ->whereYear('date', Carbon::now()->year)
+                    ->whereRaw('WEEK(date, 1) = WEEK(CURDATE(), 1)')
+                    ->groupByRaw('DAYNAME(date), ((DAYOFWEEK(date) + 5) % 7) + 1')
                     ->orderBy('day_number')
                     ->get()
                     ->keyBy('name');
 
-               
+                // Map results to include missing days with default values
                 $reportData = collect($days)->map(function ($day) use ($weeklyData) {
                     return [
                         'name' => $day,
@@ -93,7 +93,7 @@ class DashboardController extends Controller
                 });
             }
 
-            
+
             $result = [
                 'totalDonation' => $totalDonation,
                 'totalExpense' => $totalExpense,
