@@ -6,4 +6,4 @@ use App\Http\Controllers\Dashboard\DashboardController;
 
 
 
-Route::middleware('permission:readAll-dashboard')->get("/", [DashboardController::class, 'getDashboardData']);
+Route::get("/", [DashboardController::class, 'getDashboardData']);
