@@ -50,14 +50,11 @@ class InvoiceController extends Controller
                 $converted = arrayKeysToCamelCase($invoices);
                 return response()->json($converted, 200);
             } else if ($request->query('query') === 'search') {
-                $pagination = getPagination($request->query());
 
                 $invoices = Invoice::with('category:id,name,type', 'user:id,username')
                     ->where('amount', 'like', '%' . $request->query('key') . '%')
                     ->orWhere('categoryName', 'like', '%' . $request->query('key') . '%')
                     ->orWhere('donnerName', 'like', '%' . $request->query('key') . '%')
-                    ->skip($pagination['skip'])
-                    ->take($pagination['limit'])
                     ->orderBy('id', 'desc')
                     ->get();
 
@@ -88,6 +85,11 @@ class InvoiceController extends Controller
                         return $query->where('date', '>=', Carbon::createFromFormat('Y-m-d', $request->query('startDate')))
                                        ->where('date', '<=', Carbon::createFromFormat('Y-m-d', $request->query('endDate')));
                })
+               ->when($request->query('type'), function ($query) use ($request) {
+                return $query->whereHas('category', function ($query) use ($request) {
+                    return $query->where('type', $request->query('type'));
+                });
+            })
                     ->skip($pagination['skip'])
                     ->take($pagination['limit'])
                     ->orderBy('id', 'desc')
