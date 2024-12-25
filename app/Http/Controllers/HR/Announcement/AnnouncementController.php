@@ -106,20 +106,17 @@ class AnnouncementController extends Controller
     }
 
     // delete an announcement data controller method
-    public function deletedAnnouncement(Request $request, $id): jsonResponse
+    public function deleteAnnouncement($id): JsonResponse
     {
         try {
-            $deletedAnnouncement = Announcement::where('id', $id)->update([
-                'status' => $request->input('status'),
-            ]);
-
-            if ($deletedAnnouncement) {
-                return response()->json(['message' => 'Announcement Deleted Successfully'], 200);
-            } else {
-                return response()->json(['error' => 'Failed To Delete Announcement'], 404);
-            }
-        } catch (Exception $err) {
-            return $this->badRequest($err->getMessage());
+            $announcement = Announcement::findOrFail($id); // Ensures the announcement exists, or throws an exception
+            $announcement->delete();
+    
+            return response()->json(['message' => 'Announcement deleted successfully'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Announcement not found'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 }
