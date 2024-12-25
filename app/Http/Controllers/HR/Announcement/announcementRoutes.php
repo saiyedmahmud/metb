@@ -13,4 +13,5 @@ Route::middleware("permission:readSingle-announcement")->get("/{id}", [Announcem
 
 Route::middleware("permission:update-announcement")->put("/{id}", [AnnouncementController::class, 'updateSingleAnnouncement']);
 
-Route::middleware("permission:delete-announcement")->patch("/{id}", [AnnouncementController::class, 'deletedAnnouncement']);
+// Route::middleware("permission:delete-announcement")->patch("/{id}", [AnnouncementController::class, 'deletedAnnouncement']);
+Route::middleware("permission:delete-announcement")->delete("/{id}", [AnnouncementController::class, 'deleteAnnouncement']);
