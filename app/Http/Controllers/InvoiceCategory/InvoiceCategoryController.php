@@ -39,11 +39,8 @@ class InvoiceCategoryController extends Controller
                     $converted = arrayKeysToCamelCase($invoiceCategories);
                     return response()->json($converted, 200);
             } else if ($request->query('query') === 'search') {
-                $pagination = getPagination($request->query());
                 $invoiceCategories = InvoiceCategory::where('name', 'like', '%' . $request->query('key'). '%')
                     ->orWhere('type', 'like', '%' . $request->query('key') . '%')
-                    ->skip($pagination['skip'])
-                    ->take($pagination['limit'])
                     ->get();
 
                 $total = InvoiceCategory::where('name', 'like', '%' . $request->query('key'). '%')

@@ -45,19 +45,16 @@ class InvoiceController extends Controller
         try {
             if ($request->query('query') === 'all') {
                 $invoices = Invoice::with('category:id,name,type', 'user:id,username')
-                ->orderBy('id', 'desc')
-                ->get();
+                    ->orderBy('id', 'desc')
+                    ->get();
                 $converted = arrayKeysToCamelCase($invoices);
                 return response()->json($converted, 200);
             } else if ($request->query('query') === 'search') {
-                $pagination = getPagination($request->query());
 
                 $invoices = Invoice::with('category:id,name,type', 'user:id,username')
                     ->where('amount', 'like', '%' . $request->query('key') . '%')
                     ->orWhere('categoryName', 'like', '%' . $request->query('key') . '%')
                     ->orWhere('donnerName', 'like', '%' . $request->query('key') . '%')
-                    ->skip($pagination['skip'])
-                    ->take($pagination['limit'])
                     ->orderBy('id', 'desc')
                     ->get();
 
@@ -86,8 +83,13 @@ class InvoiceController extends Controller
                     })
                     ->when($request->query('startDate') && $request->query('endDate'), function ($query) use ($request) {
                         return $query->where('date', '>=', Carbon::createFromFormat('Y-m-d', $request->query('startDate')))
-                                       ->where('date', '<=', Carbon::createFromFormat('Y-m-d', $request->query('endDate')));
-               })
+                            ->where('date', '<=', Carbon::createFromFormat('Y-m-d', $request->query('endDate')));
+                    })
+                    ->when($request->query('type'), function ($query) use ($request) {
+                        return $query->whereHas('category', function ($query) use ($request) {
+                            return $query->where('type', $request->query('type'));
+                        });
+                    })
                     ->skip($pagination['skip'])
                     ->take($pagination['limit'])
                     ->orderBy('id', 'desc')
@@ -104,8 +106,8 @@ class InvoiceController extends Controller
                     })
                     ->when($request->query('startDate') && $request->query('endDate'), function ($query) use ($request) {
                         return $query->where('date', '>=', Carbon::createFromFormat('Y-m-d', $request->query('startDate')))
-                                       ->where('date', '<=', Carbon::createFromFormat('Y-m-d', $request->query('endDate')));
-               })
+                            ->where('date', '<=', Carbon::createFromFormat('Y-m-d', $request->query('endDate')));
+                    })
                     ->count();
 
                 $result = [
